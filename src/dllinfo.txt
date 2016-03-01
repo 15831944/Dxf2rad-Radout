@@ -1,0 +1,204 @@
+DllDump,  DllSetup,  DllFreeSetup,  DllNewList,   DllDestroyList,
+DllTraverse,   DllRank,   DllDelRank,   DllGetData,   DllSetData,
+DllFirst, DllNext, DllLast, DllPrev --  General  purpose  doubly-
+linked list manipulation
+
+DllSearch, DllInsert,  DllDelete  --  Sorted  doubly-linked  list
+manipulation
+
+DllPushf, DllPushr, DllPush, DllPopf, DllPopr, DllPop,  DllPeekf,
+DllPeekr,  DllPeek  --  Unsorted  doubly-linked list manipulation
+#include <dltypes.h>
+#include <dlproto.h>
+
+DLL_SETUP DllSetup(int(*comp)(void*,void*), void *data)
+builds a setup structure  before  a  doubly-linked  list  can  be
+created,  and  returns  a  pointer  to it; NULL is returned if an
+error occurs.  The setup structure is a magic cookie that can  be
+used  to  set  up  many doubly-linked lists.  It must be freed by
+calling The setup structure  can  be  freed  any  time  after  is
+called.   The  client  specifies  a  pointer  to  a function that
+compares two client-provided  data  structures.   The  comparison
+function, has the following interface:  int comp(k1,k2)
+void *k1,*k2; The result of this function is less than 0  if  the
+object  pointed  to by k1 is "less than" the object pointed to by
+k2, 0  if  they  are  "equal",  and  greater  than  0  otherwise.
+Client-provided  data  structures  that  compare  greater by this
+function will appear later in  the  lexical  order  of  the  data
+stored  in  the  list.   This  pointer may be NULL if none of the
+sorted list functions are called.  The client  may  also  specify
+the  initial  value  of  the  data  returned  by  after a list is
+instantiated.
+
+void DllFreeSetup(DLL_SETUP setup)
+frees the setup structure created by It can be  called  any  time
+after  is called.  Doubly-linked lists do not require their setup
+structures to exist after they are created.
+
+DLL_LIST DllNewList(DLL_SETUP setup)
+creates a  new  doubly-linked  list.   Given  a  DLL_SETUP  setup
+structure,  returns  a  pointer to a handle for the doubly-linked
+list, or NULL if an error occurs.
+
+void DllDestroyList(DLL_LIST list, void (*free_key)(void*,void*),
+void (*free_data)(void*,void*), void *info)
+deallocates all storage allocated to a doubly-linked  list.   The
+client  provides pointers to visitation functions that are called
+once for each item stored in the list.  The items are visited  in
+arbitrary  order.   If  NULL  is passed instead of a pointer to a
+function, no action is taken for the client-provided data or key,
+but  the  list  structure  itself  is  freed.  The and parameters
+specify functions that free  the  keys  and  user-specified  data
+stored  in  the  list.   The function is always called before the
+function.  The  parameter  is  passed  along  to  the  visitation
+functions   without   modification.   The  interfaces  for  these
+functions follow:
+    void freeThis(keyOrData,info)
+
+int DllInsert(DLL_LIST list, void *key, void *data)
+ void *keyOrData, *info; inserts a  new  item  into  a  sorted
+list.   1  is  returned  if  the  insertion was successful, -1 is
+returned if the new key matches another key that has already been
+inserted  into  the  list,  and  0 is returned in the event of an
+error.  The  parameter  is  a  pointer  to  a  user-defined  data
+structure  that  is  stored with the key, and can be retrieved by
+any access or deletion function.
+
+void *DllDelete(DLL_LIST list, void *key, void **data)
+deletes an item from an sorted list.  The value returned  is  the
+key  value  passed  to when the item was inserted, or NULL if the
+item is not found.  The parameter returns the pointer stored with
+the  key  when  was  called,  or is undefined when the key is not
+found.
+
+void *DllSearch(DLL_LIST list, void *target, void **data)
+searches for an item in a sorted list.  The value returned is the
+key  value  passed  to when the item was inserted, or NULL if the
+item is not found.  The parameter returns the pointer stored with
+the key when was called, or is undefined if the key is not found.
+
+void DllTraverse(DLL_LIST  list,  void  (*fn)(void*,void*,void*),
+void *parms)
+traverses the list, calling a client-provided visitation function
+once  for  each  item stored there.  has the following interface:
+void fn(item,data,parms)
+void *item, *data, *params; is the key pointer  stored  when  the
+item  was  inserted  into the list.  is an arbitrary pointer that
+the client wishes to pass to  the  visitation  function,  but  is
+otherwise  unused by the doubly-linked list implementation.  is a
+pointer to a user-defined structure that is stored with  the  key
+when  the item is stored in the list.  Items are visited in their
+lexical order if the list is sorted.  If the list is not  sorted,
+items  are  visited in the order they were inserted via or in the
+reverse order they were inserted via
+
+void DllDump(DLL_LIST list, void  (*key_dump)(void*,void*,void*),
+void *info)
+displays the contents of the list  to  stdout,  along  with  some
+diagnostic  and  statistical information.  The function is called
+once for each item in the list, in arbitrary order.   It  may  be
+NULL  if  no  action  is  desired.   Its interface follows:  void
+key_dump(key,data,info)
+void *key, *data, *info; Where is a key  stored  in  the  doubly-
+linked  list, and is the user-defined pointer stored with the key
+at the time the item was inserted into the list.
+
+void *DllFirst(DLL_LIST list, void **data)
+returns the item that falls earliest in the lexical order of  the
+items  stored  in  an ordered list, the earliest item pushed onto
+the list via DllPushr, the latest item pushed onto the  list  via
+DllPushf, or NULL if the list is empty.  The user-defined pointer
+stored with the key is also returned in the parameter.
+
+void *DllLast(DLL_LIST list, void **data)
+returns the item that falls latest in the lexical  order  of  the
+items  stored  in  a sorted list, the latest item pushed onto the
+list via DllPushr, the earliest item pushed  onto  the  list  via
+DllPushl, or NULL if the list is empty.  The user-defined pointer
+stored with the key is also returned in the parameter.
+
+void *DllNext(DLL_LIST list, void **data)
+returns the next item toward the end of  the  doubly-linked  list
+after  the  last call to or If the list is sorted, the key is the
+next higher one in the lexical order of the keys  stored  in  the
+list.  If failed to find an item, returns the next item higher in
+the lexical order that was stored in the list.  NULL is  returned
+if  the  end  of  the  list  is  overrun, or if the list has been
+modified since the last call to or  If  an  item  is  found,  the
+user-defined  pointer stored with the key is also returned in the
+parameter.
+
+void *DllPrev(DLL_LIST list, void **data)
+returns the next item toward the beginning of  the  doubly-linked
+list  after the last call to or If the list is sorted, the key is
+the next lower one in the lexical order of the keys stored in the
+list.   If failed to find an item, returns the next item lower in
+the lexical order that was stored in the list.  NULL is  returned
+if  the beginning of the list is overrun, or if the list has been
+modified since the last call to or  If  an  item  is  found,  the
+user-defined  pointer stored with the key is also returned in the
+parameter.
+
+void *DllRank(DLL_LIST list, int rank, void **data)
+returns the key in the  doubly-linked  list  that  falls  in  the
+position  in  the  list.   The  parameter is zero-based.  NULL is
+returned if the specified rank is less than 0 or greater or equal
+to  the number of keys stored in the list.  If the call succeeds,
+the list is left in a state such that  and  behave  as  expected.
+The  user-defined pointer stored with the key is also returned in
+the parameter.
+
+void *DllDelRank(DLL_LIST list, int rank, void **data)
+deletes the key stored in the specified position in  the  doubly-
+linked list.  The value returned is the same as that passed to or
+when the item was inserted, or NULL if the specified is  invalid.
+is zero-based, and must be less than the number of keys stored in
+the list.  The user-defined pointer stored with the key  is  also
+returned in the parameter.
+
+void *DllGetData(DLL_LIST list)
+returns a client-defined pointer  that  is  stored  in  the  list
+handle.  This pointer is set by calling This pointer is otherwise
+unused by the doubly-linked list implementation,  but  is  useful
+for storing data with the list as a whole.
+
+void DllSetData(DLL_LIST list, void *data)
+sets a list's global pointer that is returned by
+
+void *DllPushf(DLL_LIST list, void *key, void *data)
+inserts an item at the beginning of an unsorted list.
+
+void *DllPushr(DLL_LIST list, void *key, void *data)
+inserts an item at the back of an unsorted list.
+
+void *DllPush(DLL_LIST list, int where, void *key, void *data)
+inserts an item at one end of an unsorted list.  If DLL_FRONT  is
+passed as the parameter, the item is pushed onto the front of the
+list.  If DLL_BACK is passed as the parameter, the item is pushed
+onto the back of the list.
+
+void *DllPopf(DLL_LIST list, void **data)
+deletes an item from the beginning of a list, returning  the  key
+stored  when the item was inserted.  The data stored with the key
+is returned in the parameter.
+
+void *DllPopr(DLL_LIST list, void **data)
+deletes an item from the back of a list, returning the key stored
+when  the  item  was  inserted.   The data stored with the key is
+returned in the parameter.
+
+void *DllPop(DLL_LIST list, int where, void **data)
+deletes an item from one end of a list, returning the key  stored
+when  the  item  was  inserted.   The data stored with the key is
+returned in  the  parameter.   If  DLL_FRONT  is  passed  as  the
+parameter,  the  item  is deleted from the front of the list.  If
+DLL_BACK is passed as the parameter, the item is deleted from the
+back of the list.
+
+void *DllPeekf(DLL_LIST list, void **data)
+returns the key stored at the  beginning  of  the  list,  without
+modifying  the  state of the list in any way.  It differs from in
+that it does not affect subsequent calls to or  The  data  stored
+with the key is returned in the parameter.
+
+
