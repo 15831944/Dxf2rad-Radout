@@ -1,0 +1,547 @@
+.TH DLIST
+.SH NAME
+DllDump, DllSetup, DllFreeSetup, DllNewList, DllDestroyList, 
+DllTraverse, DllRank, DllDelRank, DllGetData, DllSetData,
+DllFirst, DllNext, DllLast, DllPrev
+-- General purpose doubly-linked list manipulation
+.sp
+DllSearch, DllInsert, DllDelete -- Sorted doubly-linked list manipulation
+.sp
+DllPushF, DllPushR, DllPush, DllPopF, DllPopR, DllPop, DllPeekF,
+DllPeekR, DllPeek
+-- Unsorted doubly-linked list manipulation
+.SH SYNOPSIS
+#include <dltypes.h>
+.br
+#include <dlproto.h>
+.sp
+DLL_SETUP DllSetup(int(*Comp)(void*,void*), void *data)
+.sp
+void DllFreeSetup(DLL_SETUP setup)
+.sp
+DLL_LIST DllNewList(DLL_SETUP setup)
+.sp
+void DllDestroyList(DLL_LIST list, void (*FreeKey)(void*,void*),
+void (*FreeData)(void*,void*), void *info)
+.sp
+int DllInsert(DLL_LIST list, void *key, void *data)
+.sp
+void *DllDelete(DLL_LIST list, void *key, void **data)
+.sp
+void *DllSearch(DLL_LIST list, void *target, void **data)
+.sp
+void DllTraverse(DLL_LIST list, void (*fn)(void*,void*,void*), void *parms)
+.sp
+void DllDump(DLL_LIST list, void (*KeyDump)(FILE *,void*,void*,void*), 
+void *info, FILE *fp)
+.sp
+void *DllFirst(DLL_LIST list, void **data)
+.sp
+void *DllLast(DLL_LIST list, void **data)
+.sp
+void *DllNext(DLL_LIST list, void **data)
+.sp
+void *DllPrev(DLL_LIST list, void **data)
+.sp
+void *DllRank(DLL_LIST list, int rank, void **data)
+.sp
+void *DllDelRank(DLL_LIST list, int rank, void **data)
+.sp
+void *DllGetListData(DLL_LIST list)
+.sp
+void DllSetListData(DLL_LIST list, void *data)
+.sp
+void *DllPushF(DLL_LIST list, void *key, void *data)
+.sp
+void *DllPushR(DLL_LIST list, void *key, void *data)
+.sp
+void *DllPush(DLL_LIST list, int where, void *key, void *data)
+.sp
+void *DllPopF(DLL_LIST list, void **data)
+.sp
+void *DllPopR(DLL_LIST list, void **data)
+.sp
+void *DllPop(DLL_LIST list, int where, void **data)
+.sp
+void *DllPeekF(DLL_LIST list, void **data)
+.sp
+void *DllPeekR(DLL_LIST list, void **data)
+.sp
+void *DllPeek(DLL_LIST list, int where, void **data)
+.sp
+void DllTraverseAndDelete(DLL_LIST list, int (*FindKey)(void*, void*),
+int (*FindData)(void*,void*), void *info)
+.sp
+int DllGetListSize(DLL_LIST list)
+.sp
+DLL_LIST DllCopyList(DLL_LIST list, DLL_SETUP setup, void *(*CopyKey)(void*,
+void*), void *(*CopyData)(void*, void*), void *info)
+.sp
+.SH DESCRIPTION
+These functions implement a doubly-linked list data structure.  The list
+itself stores only pointers to the client's data, and relies on
+client-provided functions for any comparisons and storage deallocation.
+.sp
+.B DllSetup
+builds a setup structure before a doubly-linked list can be created,
+and returns a pointer to it;
+NULL is returned if an error occurs.  The setup structure is a magic
+cookie that can be used to set up many doubly-linked lists.
+It must be freed by calling
+.BR DllFreeSetup .
+The setup structure can be freed any time after
+.B DllNewList
+is called.
+The client specifies a pointer to a function that compares two
+client-provided data structures.  The comparison function, 
+.BR Comp ,
+has the following interface:
+.RS
+.B
+int Comp(k1,k2)
+.br
+.B
+void *k1,*k2;
+.RE
+The result of this function is less than 0 if the object pointed to by k1 is
+"less than"
+the object pointed to by k2, 0 if they are "equal", and greater than 0
+otherwise.
+Client-provided data structures that
+compare greater by this function will appear later in the lexical order
+of the data stored in the list.
+This pointer may be NULL if none of the sorted list functions are called.
+The client may also specify the initial value of the data returned by
+.B DllGetData
+after a list is instantiated.
+.sp
+.B DllFreeSetup
+frees the setup structure created by
+.BR DllSetup .
+It can be called any time after
+.B DllNewList
+is called.  Doubly-linked lists do not require their setup structures to exist
+after they are created.
+.sp
+.B DllNewList
+creates a new doubly-linked list.  Given a DLL_SETUP setup structure,
+.B DllNewList
+returns a pointer to a handle for the doubly-linked list,
+or NULL if an error occurs.
+.sp
+.B DllDestroyList
+deallocates all storage allocated to a doubly-linked list.
+The client provides pointers
+to visitation functions that are called once for each item stored in the
+list.  The items are visited in arbitrary order.  If
+NULL is passed instead of a pointer to a function, no action is taken for
+the client-provided data or key, but the list structure itself is freed.
+The
+.B FreeKey
+and
+.B FreeData
+parameters specify functions that free the keys and user-specified data
+stored in the list.  The
+.B FreeData
+function is always called before the
+.B FreeKey
+function.  The
+.B info
+parameter is passed along to the visitation functions without modification.
+The interfaces for these functions follow:
+.RS
+.br
+    void FreeThis(keyOrData,info)
+.br
+    void *keyOrData, *info;
+.RE
+.sp
+.B DllInsert
+inserts a new item into a sorted list.  1 is returned if the insertion was
+successful, -1 is returned if the new key matches another key that has
+already been inserted into the list, and 0 is returned in the event of an
+error.  The
+.B data
+parameter is a pointer to a user-defined data structure that is stored with
+the key, and can be retrieved by any access or deletion function.
+.sp
+.B DllDelete
+deletes an item from an sorted list.
+The value returned is the key value passed to
+.B DllInsert
+when the item was inserted, or NULL if the item is not found.  The
+.B data
+parameter returns the pointer stored with the key when
+.B DllInsert
+was called, or is undefined when the key is not found.
+.sp
+.B DllSearch
+searches for an item in a sorted list.
+The value returned is the key value passed to
+.B DllInsert
+when the item was inserted, or NULL if the item is not found.  The
+.B data
+parameter returns the pointer stored with the key when
+.B DllInsert
+was called, or is undefined if the key is not found.
+.sp
+.B DllTraverse
+traverses the list, calling a client-provided visitation function
+.B fn
+once for each item stored there.
+.B fn
+has the following interface:
+.RS
+.B
+void fn(item,data,parms)
+.br
+.B
+void *item, *data, *params;
+.RE
+.B item
+is the key pointer stored when the item was inserted into the list.
+.B parms
+is an arbitrary pointer that the client wishes to pass to the visitation
+function, but is otherwise unused by the doubly-linked list implementation.
+.B data
+is a pointer to a user-defined structure that is stored with the key when
+the item is stored in the list.
+Items are visited in their lexical order if the list is sorted.  If the list
+is not sorted, items are visited in the order they were inserted via
+.B DllPushR
+or in the reverse order they were inserted via
+.BR DllPushF .
+.sp
+.B DllDump
+displays the contents of the list to stdout, along with some diagnostic and
+statistical information.  The
+.B KeyDump
+function is called once for each item in the list, in arbitrary order.  It
+may be NULL if no action is desired.  Its interface follows:
+.RS
+.B
+void KeyDump(key,data,info)
+.br
+.B
+void *key, *data, *info;
+.RE
+Where
+.B key
+is a key stored in the doubly-linked list, and
+.B data
+is the user-defined pointer stored with the key at the time the item was
+inserted into the list.
+.sp
+.B DllFirst
+returns the item that falls earliest in the lexical order of the items
+stored in an ordered list,
+the earliest item pushed onto the list via DllPushR,
+the latest item pushed onto the list via DllPushF,
+or NULL if the list is empty.  The user-defined pointer
+stored with the key is also returned in the
+.B data
+parameter.
+.sp
+.B DllLast
+returns the item that falls latest in the lexical order of the items
+stored in a sorted list,
+the latest item pushed onto the list via DllPushR,
+the earliest item pushed onto the list via DllPushl,
+or NULL if the list is empty.  The user-defined pointer
+stored with the key is also returned in the
+.B data
+parameter.
+.sp
+.B DllNext
+returns the next item toward the end of the doubly-linked list after the last
+call to
+.BR DllFirst ,
+.BR DllNext ,
+.BR DllPrev ,
+.BR DllRank ,
+or
+.BR DllSearch.
+If the list is sorted, the key is the next higher one in the lexical order
+of the keys stored in the list.
+If
+.B DllSearch
+failed to find an item,
+.B DllNext
+returns the next item higher in the lexical order that was stored in the list.
+NULL is returned if the end of the list is overrun, or if the list has been
+modified since the last call to
+.BR DllFirst ,
+.BR DllNext ,
+.BR DllPrev ,
+.BR DllRank ,
+or
+.BR DllSearch.
+If an item is found, the user-defined pointer stored with the key is also
+returned in the
+.B data
+parameter.
+.sp
+.B DllPrev
+returns the next item toward the beginning of the doubly-linked list after the
+last call to
+.BR DllLast ,
+.BR DllNext ,
+.BR DllPrev ,
+.BR DllRank ,
+or
+.BR DllSearch.
+If the list is sorted, the key is the next lower one in the lexical order
+of the keys stored in the list.
+If
+.B DllSearch
+failed to find an item,
+.B DllPrev
+returns the next item lower in the lexical order that was stored in the list.
+NULL is returned if the beginning of the list is overrun, or if the list has
+been modified since the last call to
+.BR DllLast ,
+.BR DllNext ,
+.BR DllPrev ,
+.BR DllRank ,
+or
+.BR DllSearch.
+If an item is found, the user-defined pointer stored with the key is also
+returned in the
+.B data
+parameter.
+.sp
+.B DllRank
+returns the key in the doubly-linked list that falls in the
+.BR rank th
+position in the list.
+The
+.B rank
+parameter is zero-based.
+NULL is returned if the specified rank is less than 0 or greater or equal to
+the number of keys stored in the list.
+If the call succeeds, the list is left in a state such that
+.B DllNext
+and
+.B DllPrev
+behave as expected.  The user-defined pointer stored with the key is also
+returned in the
+.B data
+parameter.
+.sp
+.B DllDelRank
+deletes the key stored in the specified position in the doubly-linked list.
+The value returned is the same as that passed to
+.BR DllInsert ,
+.BR DllPushF ,
+or
+.B DllPushR
+when the item was inserted, or NULL if the specified
+.B rank
+is invalid.
+.B rank
+is zero-based, and must be less than the number of keys stored in the list.
+The user-defined pointer stored with the key is also returned in the
+.B data
+parameter.
+.sp
+.B DllGetData
+returns a client-defined pointer that is stored in the list handle.  This
+pointer is set by calling
+.BR DllSetData .
+This pointer is otherwise unused by the doubly-linked list implementation,
+but is useful for storing data with the list as a whole.
+.sp
+.B DllSetData
+sets a list's global pointer that is returned by
+.BR DllGetData .
+.sp
+.B DllPushF
+inserts an item at the beginning of an unsorted list.
+.sp
+.B DllPushR
+inserts an item at the back of an unsorted list.
+.sp
+.B DllPush
+inserts an item at one end of an unsorted list.
+If DLL_FRONT is passed as the
+.B where
+parameter, the item is pushed onto the front of the list.
+If DLL_BACK is passed as the
+.B where
+parameter, the item is pushed onto the back of the list.
+.sp
+.B DllPopF
+deletes an item from the beginning of a list, returning the key stored when
+the item was inserted.  The data stored with the key is returned in the
+.B data
+parameter.
+.sp
+.B DllPopR
+deletes an item from the back of a list, returning the key stored when the
+item was inserted.  The data stored with the key is returned in the
+.B data
+parameter.
+.sp
+.B DllPop
+deletes an item from one end of a list, returning the key stored when the
+item was inserted.  The data stored with the key is returned in the
+.B data
+parameter.
+If DLL_FRONT is passed as the
+.B where
+parameter, the item is deleted from the front of the list.
+If DLL_BACK is passed as the
+.B where
+parameter, the item is deleted from the back of the list.
+.sp
+.B DllPeekF
+returns the key stored at the beginning of the list, without modifying the
+state of the list in any way.  It differs from
+.B DllFirst
+in that it does not affect subsequent calls to
+.B DllNext
+or
+.B DllPrev .
+The data stored with the key is returned in the
+.B data
+parameter.
+.sp
+.B DllPeekR
+returns the key stored at the back of the list, without modifying the
+state of the list in any way.  It differs from
+.B DllLast
+in that it does not affect subsequent calls to
+.B DllNext
+or
+.B DllPrev .
+The data stored with the key is returned in the
+.B data
+parameter.
+.sp
+.B DllPeek
+returns the key stored at one end of the list, without modifying the
+state of the list in any way.  If DLL_FRONT is passed as the
+.B where
+parameter, the key at the beginning of the list is returned.  If DLL_BACK
+is passed as the
+.B where
+parameter, the key at the back of the list is returned.
+This call does not affect subsequent calls to
+.B DllNext
+or
+.B DllPrev .
+The data stored with the key is returned in the
+.B data
+parameter.
+.sp
+.B DllTraverseAndDelete
+deletes a node by key from an already sorted list. The client specifies a 
+pointer to a function that compares two client-provided data structures. 
+For the description of the comparison function see 
+.B DllSetup
+.
+.sp
+.B GetListSize
+retrieves the list's size, number of nodes in the list.
+.sp
+.B DllCopyList 
+creates a new doubly linked list with the same structure and data. 
+.B DllCopyList 
+returns a pointer to a handle for the doubly linked list, or NULL if an error 
+occurs. The 
+.B CopyKey 
+and 
+.B CopyData 
+parameters specify functions that copy the keys and data stored in the list. 
+The interfaces for these functions follow:
+.RS 
+.B
+void CopyThis(keyOrData, info)
+.br
+.B
+void *keyOrData, *info;
+.RE
+.sp
+.B NOTE:
+NULL can safely be passed as the
+.B data
+parameter in any of the access functions
+.RB ( DllSearch ,
+.BR DllFirst ,
+.BR DllNext ,
+.BR DllLast ,
+.BR DllPeek ,
+.BR DllPeekF ,
+.BR DllPeekR ,
+.BR DllPrev ,
+or
+.BR DllRank )
+or deletion functions
+.RB ( DllPop ,
+.BR DllPopF ,
+.BR DllPopR ,
+.BR DllDelete ,
+or
+.BR DllDelRank ).
+.sp
+Worst case performance characteristics are listed below.
+Here, "n" is the number of items stored in the list.
+.RS
+DllSearch:  O(n)
+.br
+DllNewList:     O(1)
+.br
+DllDestroyList: O(n)
+.br
+DllInsert:  O(n)
+.br
+DllPushF:   O(1)
+.br
+DllPushR:   O(1)
+.br
+DllPush:    O(1)
+.br
+DllDelete:  O(n)
+.br
+DllPopF:    O(1)
+.br
+DllPopR:    O(1)
+.br
+DllPop: O(1)
+.br
+DllTraverse:    O(n)
+.br
+DllNext:        O(1)
+.br
+DllPrev:        O(1)
+.br
+DllFirst:       O(1)
+.br
+DllLast:        O(1)
+.br
+DllRank:    O(n)
+.br
+DllDelRank: O(n)
+.br
+DllPeekF:   O(1)
+.br
+DllPeekR:   O(1)
+.br
+DllPeek:    O(1)
+.br
+DllGetData: O(1)
+.br
+DllSetData: O(1)
+.RE
+.SH BUGS
+This implementation has not been tested on nearly
+enough platforms.
+.sp
+.B DllDump
+assumes that pointers are the same size as integers, and that they can be
+displayed in total in eight hexidecimal digits.
+.sp
+.B DllDestroyList
+does not touch the list's global data pointer, i.e. the pointer returned by
+.BR DllGetData .
+If this pointer is used, the client must explicitly free any data.
