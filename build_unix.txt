@@ -1,0 +1,44 @@
+Build instructions for dxf2rad
+==============================
+
+To build dxf2rad yourself, you need the suitable development
+tool for C installed on your system. In most cases, this will
+be some version of gcc and its associated toolchain.
+
+In most cases, invoking the makefile in the toplevel directory
+should do the trick:
+
+$>  make -f dxf2rad.mf
+
+This will build a dxf2rad executable in the same directory.
+On "exotic" platforms, you may need to change some of the 
+configuration options at the top of the makefile.
+
+
+32 bit vs. 64 bit
+=================
+
+By default, the correct type of binary for your platform will
+be built. If you want to build for a different platform than
+the build system, then you can add "-m32" or "-m64" to the
+CFLAGS string near the top of the makefile.
+
+
+Stripping the executable
+========================
+
+If you have built in debug mode, you can strip the extra
+information from the executable, thus making it smaller and
+faster to load:
+
+$> strip dxf2rad
+
+
+Building Radout
+===============
+
+Autocad on Unix is long dead, and no working makefiles from
+those historic times have been preserved.
+
+
+

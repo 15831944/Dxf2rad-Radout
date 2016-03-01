@@ -1,0 +1,100 @@
+### Top Level Makefile for dxf2rad
+
+### Start of configuration section ###############################
+### Configure the following variables for your installation. #####
+
+
+### Modify additional include and library paths
+### If your compiler is installed correctly, then you should't
+### need to change anything. Otherwise you can tell it here where
+### to find any additionaly required header and library files.
+###
+INCDIR  = 
+LIBDIR  = 
+
+
+### The compiler to use.
+###
+CC      = gcc
+LINT    = lclint
+
+
+### Compilation flags (remove "-g" if debugged)
+###
+### Gcc will automatically build as 32/64 matching your build system.
+### To force one or the other, specify -m32 or -m64 respectively.
+### When switching between 32/64 bit builds, you need "make clean" first.
+###
+CFLAGS  = -O2 -Wall -ansi -pedantic -g
+#CFLAGS  = -O3 -Wall -ansi -pedantic
+
+
+### Link stage flags (for static/dynamic linking etc. as needed)
+###
+LDFLAGS =
+
+
+### Arguments to pass to lint
+### I use LCLint - which takes a bunch ...
+###
+LINTARGS = -weak -castfcnptr +trytorecover +ignorequals -duplicatequals +posixlib -fixedformalarray
+
+### irix lint
+#LINTARGS = -mux
+
+
+
+### End of configuration section ###############################
+### It is not recommended to make changes below this line ######
+
+PROGRAM = dxf2rad
+SUBDIRS = src/dxfconv src/dll src/geom src/dxf2rad
+LOCALINCLUDE  = -I../dxfconv -I../dll -I../geom -I../dxf2rad
+
+all: $(PROGRAM)
+
+
+$(PROGRAM): src/dxf2rad/$@
+	for i in $(SUBDIRS); do \
+		(cd $$i; \
+		$(MAKE) \
+			CC="$(CC)" \
+			CFLAGS="$(CFLAGS)" \
+			LDFLAGS="$(LDFLAGS)" \
+			INCDIR="$(INCDIR) $(LOCALINCLUDE)" \
+			LIBDIR="$(LIBDIR)" \
+			PROGRAM="$(PROGRAM)" \
+		all); \
+	done
+	@rm -f $@
+	cp src/dxf2rad/$@ $@
+	@echo '*** dxf2rad build complete.'
+
+
+clean:
+	for i in $(SUBDIRS) src/dxf2rad; do \
+		(cd $$i; $(MAKE) PROGRAM="$(PROGRAM)" clean) \
+	done
+	rm -f $(PROGRAM) src/dxf2rad/$(PROGRAM) core
+
+
+
+lint:
+	for i in $(SUBDIRS); do \
+		(cd $$i; \
+		$(MAKE) \
+			LINT="$(LINT)" \
+			LINTARGS="$(LINTARGS)" \
+			INCDIR="$(INCDIR) $(LOCALINCLUDE)" \
+			PROGRAM="$(PROGRAM)" \
+		lint); \
+	done
+
+
+install:	$(PROGRAM)
+	install -s -m 755 $(PROGRAM) $(DDRHOME)/bin/$(PLATFORM)
+	install -s -m 644 $(PROGRAM).dcl $(DDRHOME)/
+	@touch install
+
+
+### End of radout/ddrad Makefile ###############################
