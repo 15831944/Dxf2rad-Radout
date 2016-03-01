@@ -5,17 +5,17 @@
 # TARGTYPE "Win32 (x86) Dynamic-Link Library" 0x0102
 
 CFG=radout_r15 - Win32 Debug
-!MESSAGE Dies ist kein gültiges Makefile. Zum Erstellen dieses Projekts mit NMAKE
-!MESSAGE verwenden Sie den Befehl "Makefile exportieren" und führen Sie den Befehl
+!MESSAGE Dies ist kein gÃ¼ltiges Makefile. Zum Erstellen dieses Projekts mit NMAKE
+!MESSAGE verwenden Sie den Befehl "Makefile exportieren" und fÃ¼hren Sie den Befehl
 !MESSAGE 
 !MESSAGE NMAKE /f "radout_r15.mak".
 !MESSAGE 
-!MESSAGE Sie können beim Ausführen von NMAKE eine Konfiguration angeben
+!MESSAGE Sie kÃ¶nnen beim AusfÃ¼hren von NMAKE eine Konfiguration angeben
 !MESSAGE durch Definieren des Makros CFG in der Befehlszeile. Zum Beispiel:
 !MESSAGE 
 !MESSAGE NMAKE /f "radout_r15.mak" CFG="radout_r15 - Win32 Debug"
 !MESSAGE 
-!MESSAGE Für die Konfiguration stehen zur Auswahl:
+!MESSAGE FÃ¼r die Konfiguration stehen zur Auswahl:
 !MESSAGE 
 !MESSAGE "radout_r15 - Win32 Release" (basierend auf  "Win32 (x86) Dynamic-Link Library")
 !MESSAGE "radout_r15 - Win32 Debug" (basierend auf  "Win32 (x86) Dynamic-Link Library")
