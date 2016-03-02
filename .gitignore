@@ -4,3 +4,8 @@
 *.c~
 *.swp
 dxf2rad
+*.mf~
+distr_dxf2rad/
+*.gitignore~
+dxf2rad_r.exe
+*.html~
