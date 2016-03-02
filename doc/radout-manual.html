@@ -1,0 +1,401 @@
+<html>
+<head>
+<title>Radout User Manual</title>
+<style>
+html, body {margin:0px; padding:0px; border:0px;}
+h1 {background:#ffff00; margin:0px 0px 10px; padding:10px;}
+h2 {background:#ddddff; padding:0px 10px;}
+h4 {padding:0px 10px;}
+div {padding:0px 10px;}
+div.nav {background:#cccccc; padding:10px 10px;}
+dl {background:#eeeeff; padding:0px 0px;}
+dt {background:#dddddd; padding:0px 0px;}
+span.dim {color:#4444dd;}
+</style>
+</head>
+
+<h1>Radout 3.9.7<br>User Manual </h1>
+
+
+<div>
+	Radout - Export facility from Autocad/Intellicad to Radiance scene
+	description.
+</div>
+
+<a name="Contents"> <h2> Contents </h2>  </a>
+<div>
+<ul>
+<li> <a href="#DESCRIPTION">Description<br> </a>
+<li> <a href="#INSTALLATION">Installation<br> </a>
+<li> <a href="#INTERFACE">Interface<br> </a>
+<li> <a href="#OPTIONS">Options<br> </a>
+<li> <a href="#FILES">Files<br> </a>
+<li> <a href="#REQUIREMENTS">Requirements<br> </a>
+<li> <a href="#CAVEATS">Caveats<br> </a>
+<li> <a href="#BUGS">Bugs<br> </a>
+<li> <a href="#AUTHORS">Authors<br> </a>
+<li> <a href="#SEE ALSO">See Also<br> </a>
+<li> <a href="#LICENSE">License<br> </a>
+</ul>
+</div>
+
+
+
+
+
+<a name="DESCRIPTION"> <h2> Description </h2> </a>
+<div>
+	Software extension for Autocad/Intellicad to export data to the Radiance
+	lighting simulation package of the Lawrence Berkeley Laboratory.
+<p>
+    Autocad/Intellicad entities can be selected and filtered in various ways.
+<p>
+    Entities are sorted either by color or by layer.
+    The sorting results in seperate files written for every layer or color.
+	Optionally other files can be created.
+    This includes initial material definitions
+    (plastic with the color as visible in autocad), a setup of sun
+    and sky and a rif file as direct input to rad(1).
+<p>
+    Only entities that are visible (that is their layer is on and thawed)
+    will be exported, even when nested in a selected block. This provides
+	another method of filtering elements of your drawing and is especially
+	useful when you want to update only part of a scene.
+<p>
+    The layer name or color number will be part of each respective filename
+	to make it an unique identifier. The pipe character "|" used by
+	Autocad/Intellicad within layernames associated with externally referenced
+	blocks, as well as the dollar sign "$" are replaced by an underscore "_" as
+	they are illegal or at least confusing characters for filenames on most
+	systems.
+</div>
+
+
+<a name="INSTALLATION"> <h2> Installation </h2> </a>
+<div>
+	Radout is "installed", if the files radout.arx and radout.dcl 
+	are placed in a location which is included in
+    your Autocad/Intellicad support search path.
+	This support path is configured from the "Options" dialog.
+<p>
+	Load the program through the APPLOAD dialog or 
+	by entering <code>(arxload&nbsp;"radout")</code>
+	(including the parens) at the Autocad/Intellicad command prompt. 
+</div>
+
+
+
+<a name="INTERFACE"> <h2> Interface </h2> </a>
+<div>
+	The program is started by typing <code>radout</code> at the
+	Autocad/Intellicad command prompt.
+    This will open a dialog box to configure all export options:
+<p>
+    <img src="radout.png">
+</div>
+
+<a name="OPTIONS"> <h2> Options </h2> </a>
+<div>
+<h4>Write Filetypes:</h4>
+		The settings in the upper right frame  specify which file types
+		to export:
+		<p>
+		Radout does not edit the exported files. Every time you export data,
+		any existing files with the same names will be overwritten
+		without warning.
+<dl>
+<p><dt>
+        Geometry files <dd>
+            This switch is on by default, as it is the basic purpose
+            of the program. Turning it off will disable the list of sampled
+            entity types and the sampling mode selection.
+
+<p><dt> Materials file <dd>
+            The materials of the exported objects will have
+            the same color (a plastic) as they appear with in autocad.
+
+<p><dt> Radiance Input File (rif) <dd>
+            This file can be given to the rad(1) program and contains
+			the basic information needed to run a simulation.
+
+<p><dt> Exterior daylight file <dd>
+            This option sets the parameters of natural lighting as
+			required by gensky.
+			The input fields activated by this option determine
+			your location (Longitude/Latitude) and time of day and year
+			(Month/Day/Hour/Timezone).
+
+</dl>
+
+<h4>Sampling modes:</h4>
+		The settings in the lower right frame let you specify the way the
+		geometry will be converted.
+
+<dl>
+<p><dt> Assign materials by: <dd>
+<dl>
+            Select the sorting method out of the following.
+<p><dt> Color <dd>
+                The Autocad/Intellicad color number as visible on the screen.
+                This is the default and will help you when you organize
+                your drawing "visually".
+
+<p><dt> Layer <dd>
+                The layer of every subentity (the one which this entity
+                is created on). Choose this method if you use a conceptual
+                layering system independently from screen display colors.
+
+</dl>
+<p>         The concept of floating layers and colors within (nested)
+            blocks is fully supported. That means a subentity within a
+            block with on layer "0" and/or with the color "byblock" will
+            appear on the layer and with the color of the containing block.
+            This continues recursively if the block has those properties as
+            well until a level with explicitly defined properties or the
+            top level block is reached.  Toplevel entities with the
+            color "byblock" are drawn with color nr. 7 (white).
+
+
+<p><dt> Distance Tolerance for arc approx: <dd>
+            Arc entities and arc segments of polylines have to be meshed
+            for the use in Radiance. This value specifies
+            how smooth these meshes will appear in the final image.
+            Higher values will make smoother surfaces.
+			The default of 0.1. It is recommended to test for
+			optimised settings, balancing file size and visual accuracy,
+			since the optimal settings depends on the size and scale
+			of your model.
+
+<p><dt> Angle Tolerance for arc approx: <dd>
+			(This option is not available for all versions of Radout)
+			The surface normal of neighbouring mesh elements will not
+			differ by more than this amount in degrees. The default
+			is 15.0 degrees, which usually gives reasonable results.
+			The effect of this setting is independent of model size
+			and complexity. Please note that very low values (eg. below 2.0
+			degrees) can lead to unreasonably big output files and may even
+			crash Autocad/Intellicad when running out of memory.
+
+<p><dt> Output scaling factor<dd>
+		Output geometry will be scaled according to this factor. Radiance
+		preferrably uses international (SI) units, ie. meters.
+
+</dl>
+
+<h4>Geometry to Export:</h4>
+		The switches in the left column specify which entity types get
+		extracted from your drawing and what type of surface they will
+		result in.
+		By default all entities that visible as a surface in Autocad/Intellicad
+		(opaque for the hide and shade/render commands) are activated.
+		Some other entity types can be used to simplify modelling but are
+		rendered differentely in Autocad/Intellicad than in Radiance.
+		Those are off by default and have to be enabled by the user explicitly.
+		<p>
+		All polygons should keep their orientation as created in
+		Autocad/Intellicad determined by the right hand rule as explained in
+		the Radiance tutorial.
+        Entities extruded by thickness will be inverted if their thickness
+		value (or "PDSIZE" for point entities) is negative.
+		2d-Polylines and lightweight polylines are treated the same.
+<p>
+        The supported export types and their results are:
+<dl>
+<p><dt> 3DFACEs <dd>
+            3dfaces will be split to two triangular polygons if not planar.
+<p><dt> Extruded TRACEs <dd>
+            Traces will appear as a single polygon or as a box if the
+            thickness is non-zero.
+<p><dt> Extruded SOLIDs <dd>
+            Solids will appear as a single polygon or as a box if the
+            thickness is non-zero.
+<p><dt> Extruded CIRCLEs <dd>
+            Circles will appear as a ring with a inner radius of zero
+            or as a cylinder/tube with a ring at either end if their
+            thickness is non-zero.
+<p><dt> Extruded ARCs <dd>
+            Arcs with non-zero thickness will be segmented
+            according to the given arc tolerance.
+<p><dt> Extruded LINEs <dd>
+            Lines with non-zero thickness will appear as a single polygon.
+<p><dt> Extruded 2D-PLINEs <dd>
+            2d-polylines with non-zero thickness will appear
+            as a set of polygons.
+<p><dt> Wide 2D-PLINEs <dd>
+            2d-polylines with a non-zero starting width set in
+            their header entity (not the vertexes!) will appear as a
+            polygon following the trace of the polyline with a constant
+            width. This option will override the one below for poly-
+            lines that match both categories.
+            Together with a thickness and the respective option set this
+            will will result in a kind of a quadrilateral worm.
+<p><dt> 3D-MESHes <dd>
+            The Faces of 3d-polygon meshes will appear as a set of
+            polygons ignoring spline fits of any kind. Nonplanar faces
+            will be split into two triangles.
+<p><dt> POLYFACEs <dd>
+            The faces of polyface meshes will
+            appear as a set of polygons. Nonplanar faces will be split
+            into two triangles.
+<p><dt> Closed 2d-PLINES <dd>
+            2d-polylines with the closed flag set in their header entity
+            will appear as a polygon of the shape of the polyline.
+            Polylines with a width will not follow this rule if the
+            respective option above is chosen as well (Wide 2d-plines).
+            Together with a thickness and the respective option set this
+            will result in a prismatic volume of the shape of the polyline.
+            This option is off by default. 
+<p><dt> POINTs as Spheres <dd>
+            Point entities will appear as spheres or bubbles depending on
+            either their thickness (if any) or else the value of the
+			Autocad/Intellicad system variable "PDSIZE". if the result is zero
+			the entity is ignored.
+            This option is off by default.
+<p><dt> ACIS entities <dd>
+			The three items relating to ACIS solid modelling entities
+			may be disabled for very old Autocad/Intellicad releases.
+
+</dl>
+
+<h4>File Names:</h4>
+<dl>
+<p><dt> Basename for Output:<dd>
+        The names of all output files will start
+        with the string entered here. Default is the name of the drawing
+        file.
+</dl>
+
+<h4> OK/Cancel buttons  </h4>
+        The OK button starts the exporting after you have selected the
+        entities you wish to extract. The Cancel button discards all the
+        setting you have made and terminates the program.
+
+</div>
+
+<a name="FILES"> <h2> Files </h2> </a>
+<div>
+
+<h4> Program files </h4>
+<dl>
+<dt>   radout.arx/radout.dll <dd>          Main program file.
+<dt>   radout.dcl <dd>      Dialog box definition file.
+</dl>
+
+<h4> Additional Files </h4>
+<dl>
+<dt>   manual.html <dd>      This File.
+<dt>   <a href="radout-readme.html">radout-readme.html</a> <dd>  general info.
+</dl>
+
+<h4> Data files (generated by Radout)</h4>
+"Prefix" is the base name specified in the configuration dialog.
+<dl>
+	<dt>   <span class="dim">&lt;prefix&gt;</span>_l<span class="dim">&lt;layername&gt;</span>.rad <dd>
+                        Geometry data written with the Layer or Toplayer
+                        samplemodes set.
+						<dt>   <span class="dim">&lt;prefix&gt;</span>_c<span class="dim">&lt;colornumber&gt;</span>.rad <dd>
+                        Geometry data written with the Color samplemode set.
+						<dt>   <span class="dim">&lt;prefix&gt;</span>_mat.rad <dd>    Material definitions for exported files.
+						<dt>   <span class="dim">&lt;prefix&gt;</span>_sun.rad <dd>    Daylight source definitions.
+						<dt>   <span class="dim">&lt;prefix&gt;</span>.rif <dd>    Radiance input file for rad(1).
+</dl>
+
+</div>
+
+
+<a name="REQUIREMENTS"> <h2> Requirements </h2> </a>
+<div>
+    Radout 3.9.7 is meant to run with Autocad R12 and up,
+	and for Intellicad 2000 and up.
+<p>
+	Most recent actively supported Platforms were Autocad 2000 (R13)
+	and Intellicad 2004.
+</div>
+
+
+<a name="CAVEATS"> <h2> Caveats </h2> </a>
+<div>
+    Please note that the AME solid modelling package by Autodesk as
+	included in Autocad R10-R12 generates
+    surfaces with surface normals pointing to the inside of the created
+    volumes (at least most of the times).
+<p>
+    Models created with the AME Solid modelling package must have surfaces
+    defined with the command "SOLMESH". Otherwise they consist of only
+    wireframe information wich cannot be extracted by Radout.
+<p>
+    The "SOLID" entities in Autocad/Intellicad, which can be extracted with the
+    "Extruded and flat Solids" option, have nothing to do with solid
+    modelling, AME or ACIS. These are a feature out of the 2D days of
+	Autocad and are just flat quadrilateral faces which appear solidly
+	filled when viewed from top. They form quadrilateral prisms if
+	extruded, which can only be done in a right angle to their ground plane.
+
+<p>
+	Custom entity types defined by 3rd party applications ("proxies",
+	previously "zombies") are ignored, with the notable exception of
+	ACIS solid modelling entities.
+</div>
+
+<a name="BUGS"> <h2> Bugs </h2> </a>
+<div>
+	For multiple inserts, only one item is exported.
+<p>
+	On SGI systems, if the last (closing) segment of a polyline is an arc,
+	it may end up in a very strange position. This happens most often with
+	donuts.
+
+</div>
+
+
+<a name="AUTHORS"> <h2> Authors </h2> </a>
+<div>
+    Philip Thompson (original author)<br>
+	Georg Mischler (current copyright owner)
+</div>
+
+<a name="SEE ALSO"> <h2> See Also </h2> </a>
+<div>
+    ADS and ARX Programmers Reference Manuals, Autocad Reference Manual
+	and Customization Guide for Autocad, AutoDesk Inc.
+<p>
+    Tutorial and manual pages of Radiance 3.1, Synthetic Imaging System.
+    Gregory Ward Larson, Lawrence Berkeley Laboratory, Berkeley, CA.
+</div>
+
+<a name="LICENSE"> <h2> License </h2> </a>
+<div>
+<pre>
+The MIT License (MIT)
+
+Copyright &copy; 1994-1998 Philip Thompson, Boston MA, USA.
+Copyright &copy; 1999-2000 Georg Mischler, Munich, Germany.
+ 
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+</pre>
+
+</div>
+
+<div class="nav">
+Homepage: 
+<a href="http://www.schorsch.com/">www.schorsch.com</a> /
+<a href="http://www.schorsch.com/en/download">Download Area</a> /
+<a href="http://www.schorsch.com/en/download/radout/">Radout</a>
+</div>
+</body>

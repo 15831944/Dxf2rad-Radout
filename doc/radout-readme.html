@@ -1,0 +1,154 @@
+<html>
+<head>
+<title>Radout - Export Geometry from Autocad/Intellicad to Radiance</title>
+<style>
+html, body {margin:0px; padding:0px; border:0px;}
+h1 {background:#ffff00; margin:0px 0px 10px; padding:10px;}
+h2 {background:#ddddff; padding:0px 10px;}
+h4 {padding:0px 10px;}
+div {padding:0px 10px;}
+div.nav {background:#cccccc; padding:10px 10px;}
+dl {background:#eeeeff; padding:0px 0px;}
+dt {background:#dddddd; padding:0px 0px;}
+table {border-collapse:collapse;}
+td, th {padding:5px 10px;}
+th {text-align:left; background:#ccffcc;}
+tr:nth-child(even) {background:#e8e8e8;}
+tr:nth-child(odd) {background:#ccccff;}
+</style>
+</head>
+
+<body>
+
+<h1>Radout 3.9.7 <br> Export Geometry from Autocad/Intellicad to Radiance</h1>
+<div>
+
+<a href="radout-manual.html">Manual page</a>, Complete reference and user guide.
+
+</div>
+<h2>What is Radout:</h2>
+<div>
+
+Radout is an application for Autocad/Intellicad, exporting geometry data to the
+<a href="http://www.radiance-online.org/">Radiance</a>
+lighting simulation package.
+<p>
+Radout is conceptually based on the old
+<a href="http://www.schorsch.com/en/download/torad/">torad.lsp</a> program,
+which provided the inspiration and some of the understanding of autocad's
+workings to the original author Philip Thompson.
+<br>
+The main differences are:
+
+<ul>
+	<li> Compiled in C/C++, executes many times faster.
+	<li> Creates a simple rif file for immediate input to rad(1).
+	<li> Some bugs avoided, some new introduced.
+	<li> Much better arc/bulge approximation.
+	<li> Exports light weight polylines in R14 and up.
+</ul> 
+
+	Radout is an integral part of the architectural lighting design
+	software package
+	<a href="http://www.schorsch.com/en/software/rayfront/">Rayfront</a>,
+	which offers complete control over all parameters of
+	Radiance simulations.
+</div>
+
+<h2>Features</h2>
+<div>
+<ul type=square>
+<li> Translates all hiding/shading entities from Autocad/Intellicad, including
+ACIS solids.
+<li> Entities can be selected on screen for selective export.
+<li> Entities sorted either by color or by layer.
+    The sorting results in seperate files written for every layer or color.
+    Floating layers and colors within blocks are fully supported.
+<li> Other files created optionally can contain material definitions,
+	 a setup of sky and sun, and a rif file.
+<li> Only the entities that are visible (that is their layer is on and thawed)
+    will be exported, even when nested in a selected block. This gives you
+    another method of filtering elements of your drawing especially usefull
+    when you want to update only part of a scene.
+<li> The layer name or color number will be part of each respective filename
+    to make it an unique identifier.
+<li> You have full control through a interactive dialog box.
+</ul>
+
+    Entities exported (by choice):
+	<p>
+<table>
+<tr><th>    Autocad/Intellicad entities </th><th>           Radiance objects
+</th></tr>
+
+<tr><td>  3dfaces                   </td><td>  triangular or quadrilateral polygons.
+</td></tr>
+		<tr><td>  extruded or flat traces   </td><td>  triangular and/or quadrilateral polygons.
+</td></tr>
+				<tr><td>  extruded or flat solids   </td><td>  triangular and/or quadrilateral polygons.
+</td></tr>
+<tr><td>  extruded or flat circles  </td><td>  rings and quadrilateral polygons.
+</td></tr>
+<tr><td>  extruded arcs             </td><td>  quadrilateral polygons.
+</td></tr>
+<tr><td>  extruded lines            </td><td>  quadrilateral polygons.
+</td></tr>
+<tr><td>  extruded 2d-(lw)plines    </td><td>  quadrilateral polygons.
+</td></tr>
+<tr><td>  wide 2d-(lw)plines        </td><td>  multilateral polygons.
+</td></tr>
+<tr><td>  closed 2d-(lw)plines      </td><td>  multilateral polygons.
+</td></tr>
+<tr><td>  3d-meshes                 </td><td>  triangular or quadrilateral polygons.
+</td></tr>
+<tr><td>  polyfaces                 </td><td>  triangular or quadrilateral polygons.
+</td></tr>
+<tr><td>  points                    </td><td>  spheres or bubbles.
+</td></tr>
+
+<tr><td>  ACIS solid modelling entities </td><td>  triangular polygons.
+</td></tr>
+</table>
+</div>
+
+
+
+<a name="LICENSE"> <h2> License </h2> </a>
+<div>
+<pre>
+The MIT License (MIT)
+
+Copyright &copy; 1994-1998 Philip Thompson, Boston MA, USA.
+Copyright &copy; 1999-2000 Georg Mischler, Munich, Germany.
+ 
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+</pre>
+
+</div>
+
+
+
+<div class="nav">
+	Homepage:
+<a href="http://www.schorsch.com/">www.schorsch.com</a> /
+<a href="http://www.schorsch.com/en/download">download area</a> /
+<a href="http://www.schorsch.com/en/download/radout/">Radout</a>
+</div>
+</body>
+</html>
