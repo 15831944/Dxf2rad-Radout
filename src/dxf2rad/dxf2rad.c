@@ -135,24 +135,25 @@ void show_copyright(void)
 {
 	fprintf(stderr, "\n\
    dxf2rad " DXF2RAD_VER "\n\
-   Copyright 2000-2014 Georg Mischler, Munich, Germany\n");
+   Copyright 2000-2016 Georg Mischler, Munich, Germany\n");
+	fprintf(stderr, "\nThe MIT License (MIT)\n\n\
+Permission is hereby granted, free of charge, to any person obtaining a copy\n\
+of this software and associated documentation files (the \"Software\"), to deal\n\
+in the Software without restriction, including without limitation the rights\n\
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell\n\
+copies of the Software, and to permit persons to whom the Software is\n\
+furnished to do so, subject to the following conditions:\n");
 	fprintf(stderr, "\n\
-   Permission to use, copy, and distribute this software for\n\
-   any purpose and without fee is hereby granted, provided that\n\
-   the above copyright notice appears in all copies, that both\n\
-   that copyright notice and this permission notice appear in\n\
-   all supporting documentation and that no part of this software\n\
-   and its documentation is sold for profit or is included in\n\
-   any package sold for profit.\n");
-	fprintf(stderr, "\
-   Sale of this software and its documentation or any part of it\n\
-   for profit or inclusion of any part of this software or its\n\
-   documentation in a package sold for profit requires the prior\n\
-   written consent of the copyright holder.\n");
+The above copyright notice and this permission notice shall be included in all\n\
+copies or substantial portions of the Software.\n");
 	fprintf(stderr, "\n\
-   THIS SOFTWARE IS PROVIDED \"AS IS\" WITHOUT ANY EXPRESS OR IMPLIED\n\
-   WARRANTY. ALL IMPLIED WARRANTIES OF FITNESS FOR ANY PARTICULAR\n\
-   PURPOSE AND OF MERCHANTABILITY ARE HEREBY DISCLAIMED.\n");
+THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n\
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\n\
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\n\
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\n\
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\n\
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\n\
+SOFTWARE.\n\n");
 	exit(0);
 }
 
