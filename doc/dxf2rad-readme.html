@@ -1,0 +1,126 @@
+<html>
+<head>
+<title>dxf2rad - Convert Geometry from DXF to Radiance</title>
+<style>
+html, body {margin:0px; padding:0px; border:0px;}
+h1 {background:#ffff00; margin:0px 0px 10px; padding:10px;}
+h2 {background:#ddddff; padding:0px 10px;}
+h4 {padding:0px 10px;}
+div {padding:0px 10px;}
+div.nav {background:#cccccc; padding:10px 10px;}
+dl {background:#eeeeff; padding:0px 0px;}
+dt {background:#dddddd; padding:0px 0px;}
+table {border-collapse:collapse;}
+td, th {padding:5px 10px;}
+th {text-align:left; background:#ccffcc;}
+tr:nth-child(even) {background:#e8e8e8;}
+tr:nth-child(odd) {background:#ccccff;}
+</style>
+</head>
+
+<body>
+
+<h1>dxf2rad 1.1.0 <br> Convert Geometry from DXF to Radiance</h1>
+
+<div>
+
+<a href="dxf2rad-manual.html">Manual page</a>
+- Complete reference and user guide.
+
+</div>
+
+<h2>What is dxf2rad:</h2>
+<div>
+
+Dxf2rad is a command line utility for translating geometry
+data from the DXF file format into the format understood by the
+<a href="http://www.radiance-online.org/">Radiance</a>
+lighting simulation package.
+<p>
+Dxf2rad shares a lot of code with
+<a href="http://www.schorsch.com/en/download/radout/">Radout</a>,
+an Autocad extension to export geometry directly from within a drawing.
+It was written to support the architectural lighting design
+software package <b><a href="http://www.schorsch.com/en/software/rayfront/">Rayfront</a></b>,
+which offers complete control over all parameters of a Radiance simulation.
+
+</div>
+
+<h2>Features</h2>
+<div>
+<ul type=square>
+<li>Any DXF file in a valid format as specified with any release
+	of Autocad can be converted.
+<li>All hiding/shading entities from Autocad can be converted, and some more
+	(ACIS solids in DXF files by R14 and Autocad 2000, as well as other
+	objects defined by third party applications are not supported).
+<li>Blocks are fully supported, as long as the file actually
+	contains their definitions.
+<li>Output primitives will have modifiers based on the layer of each
+	entity in the form "l_&lt;layer&gt;".
+    Floating layers within blocks are fully supported.
+<li>The output can be scaled by an arbitrary factor.
+<li> Entity types can be filtered through command line switches.
+<li> Option to write each named view defined in the DXF file into a Radiance
+	view file.
+</ul>
+
+    Entities exported (by choice):
+	<p>
+<table>
+	<tr><th>DXF entities:  </th><th>Radiance objects:</th></tr>
+
+<tr><td>3dfaces</td><td>  triangular or quadrilateral polygons</td></tr>
+<tr><td>extruded or flat traces</td><td>  triangular and/or quadrilateral polygons</td></tr>
+<tr><td>extruded or flat solids</td><td>  triangular and/or quadrilateral polygons</td></tr>
+<tr><td>extruded or flat circles</td><td>  rings and cylinders/tubes</td></tr>
+<tr><td>extruded arcs</td><td>  quadrilateral polygons</td></tr>
+<tr><td>extruded lines</td><td>  quadrilateral polygons</td></tr>
+<tr><td>extruded 2d-(lw)plines</td><td>  quadrilateral polygons</td></tr>
+<tr><td>wide 2d-(lw)plines</td><td>  multi- and quadrilateral polygons</td></tr>
+<tr><td>closed 2d-(lw)plines</td><td>  multi- and quadrilateral polygons</td></tr>
+<tr><td>3d-meshes</td><td>  triangular or quadrilateral polygons</td></tr>
+<tr><td>polyfaces</td><td>  triangular or quadrilateral polygons</td></tr>
+<tr><td>points</td><td>  spheres or bubbles</td></tr>
+
+</table>
+
+
+</div>
+
+<h2>License</h2>
+<div>
+<pre>
+The MIT License (MIT)
+
+Copyright &copy; 2000-2016 Georg Mischler, Munich, Germany.
+ 
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+</pre>
+
+</div>
+
+<div class="nav">
+	Homepage:
+<a href="http://www.schorsch.com/">www.schorsch.com</a> /
+<a href="http://www.schorsch.com/en/download/">download area</a> /
+<a href="http://www.schorsch.com/en/download/dxf2rad/">dxf2rad</a>
+</div>
+</body>
+</html>

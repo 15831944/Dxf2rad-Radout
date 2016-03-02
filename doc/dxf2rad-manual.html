@@ -1,0 +1,348 @@
+<html>
+<head>
+<title>Dxf2rad User Manual</title>
+<style>
+html, body {margin:0px; padding:0px; border:0px;}
+h1 {background:#ffff00; margin:0px 0px 10px; padding:10px;}
+h2 {background:#ddddff; padding:0px 10px;}
+h4 {padding:0px 10px;}
+div {padding:0px 10px;}
+div.nav {background:#cccccc; padding:10px 10px;}
+dl {background:#eeeeff; padding:0px 0px;}
+dt {background:#dddddd; padding:0px 0px;}
+table {border-collapse:collapse;}
+td, th {padding:5px 10px;}
+th {text-align:left; background:#ccffcc;}
+tr:nth-child(even) {background:#e8e8e8;}
+tr:nth-child(odd) {background:#ccccff;}
+</style>
+
+</head>
+<body>
+
+<h1>Dxf2rad 1.1.0<br> User Manual</h1>
+
+<div>
+    Dxf2rad - Geometry converter from DXF to Radiance.
+</div>
+
+<a name="Contents"><h2>Contents</h2></a>
+<div>
+<ul>
+<li><a href="#synopsis">Synopsis</a></li>
+<li><a href="#descr">Description</a></li>
+<li><a href="#install">Installation</a></li>
+<li><a href="#options">Options</a></li>
+<li><a href="#examples">Examples</a></li>
+<li><a href="#files">Files</a></li>
+<li><a href="#caveats">Caveats</a></li>
+<li><a href="#bugs">Bugs</a></li>
+<li><a href="#author">Author</a></li>
+<li><a href="#see">See Also</a></li>
+<li><a href="#license">License</a></li>
+</ul>
+
+</div>
+
+<a name="synopsys"><h2>Synopsys</h2></a>
+<div>
+<pre>
+dxf2rad [options] dxffile [radfile]
+
+Where options may include:
+  -h        help (show this text and exit)
+  -H        display copyright and license and exit
+  +g/-g     do/don't export geometry data (default +g)
+  -G prefix geometry modifier prefix (default "l_")
+  -a atol   angle tolerance for arc subdivision (default 15.0°)
+  -d dtol   distance tolerance for arc subdivision (default 0.1)
+  +v/-v     do/don't export views (default -v)
+  -V prefix view file prefix (default "<radfile>_")
+  -r        report progress (repeat for verbosity)
+  -s scale  multiply all dimensions with scale
+  -ennn     exclude entity types
+  +ennn     include entity types
+            Where each 'n' is one out of (with defaults):
+            a  + 3D FACEs
+            b  + Extruded and Flat 2D SOLIDs
+            c  + Extruded and Flat TRACEs
+            d  + Extruded 2D PLINEs
+            e  + Wide 2D PLINEs
+            f  - Closed 2D PLINEs as Polygons
+            g  + 3D MESHes
+            h  + POLYFACEs
+            i  + Extruded LINEs
+            j  + Extruded ARCs
+            k  + Extruded and Flat CIRCLEs
+            l  - POINTs as Spheres
+
+If <radfile> is omitted or is the single character '-',
+then the geometry output will go to stdout, in which case
+progress reporting is suppressed.
+</pre>
+
+
+</div>
+
+<a name="descr"><h2>Description</h2></a>
+<div>
+	Dxf2rad is a command line utility for translating geometry
+	data from the DXF file format into the format understood by the
+	<a href="http://www.schorsch.com/rayfront/radiance.html">Radiance</a>
+	lighting simulation package.
+<p>
+    DXF entities can be filtered by command line options.
+<p>
+	Output primitives will have modifiers based on the layer of each
+	entity in the form "l_&lt;layer&gt;".
+    Floating layers within blocks are fully supported.
+    "Funny characters" in the layer name will replaced by an underscore
+	each.
+<p>
+
+
+
+</div>
+
+<a name="install"><h2>Installation</h2></a>
+<div>
+    Dxf2rad is a standalone application that doesn't require any
+	special installation procedures. If the binary is somewhere
+	on your $PATH, then you can call it anywhere without restriction.
+
+
+
+</div>
+
+<a name="options"><h2>Options</h2></a>
+<div>
+
+<dl compact="compact">
+
+<p><dt><b>-h</b><dd>
+            Print a short usage description to the console and exit.
+<p><dt><b>-H</b><dd>
+            Print the copyright and free license statements and exit.
+<p><dt><b>-v</b><dd>
+			Verbose: Report progress on standard error (repeating
+			this option increases verbosity).
+
+<p><dt><b>-s scale</b><dd>
+			All output will be scaled by the scale factor.
+
+
+<p><dt><b>-d dtol</b><dd>
+		Distance Tolerance for arc approximation.
+            Arc entities and arc segments of polylines have to be meshed
+            for the use in Radiance. This value specifies
+            how smooth these meshes will appear in the final image.
+            Higher values will make smoother surfaces.
+			The default of 0.1. It is recommended to test for
+			optimised settings, balancing file size and visual accuracy,
+			since the optimal setting depends on the size and scale
+			of your model.
+
+<p><dt><b>-a atol</b><dd>
+		Angle Tolerance for arc approximation.
+			The surface normal of neighbouring mesh elements will not
+			differ by more than this amount in degrees. The default
+			is 15.0 degrees, which usually gives reasonable results.
+			The effect of this setting is independent of model size
+			and complexity. Please note that very low values (eg. below 2.0
+			degrees) can lead to unreasonably big output files and may even
+			crash dxf2rad when running out of memory.
+
+<p><dt><b>-s scale</b><dd>
+	Output scaling factor.
+		Output geometry will be scaled according to this factor. Radiance
+		preferrably uses international (SI) units, ie. meters.
+
+
+<p><dt><b>+e str</b><dd> Include entities
+<dt><b>-e str</b><dd> Exclude entities
+<p>
+		"str" is a string of characters out of the following,
+		specifying which entity types are to be included
+		or excluded.
+         By default
+        all entities that define a surface in Autocad (opaque for the
+        hide and shade/render commands) are included.
+        All polygons keep their orientation as created in Autocad
+        determined by the right hand rule as explained in the Radiance
+        tutorial.
+        Entities extruded by thickness will be inverted if their thickness
+        value (or "PDSIZE" for point entities) is negative.
+		2d-polilines and lightweight polylines are treated the same.
+<p><dl>
+<p><dt><b>a</b> - 3D FACEs<dd>
+            3dfaces will be split to two triangular polygons if not planar.
+<p><dt><b>b</b> - Extruded and flat 2D SOLIDs <dd>
+            Solids will appear as a single polygon or as a box if the
+            thickness is non-zero.
+<p><dt><b>c</b> - Extruded TRACEs <dd>
+            Traces will appear as a single polygon or as a box if the
+            thickness is non-zero.
+<p><dt><b>d</b> - Extruded 2D PLINEs <dd>
+            2d-polylines with a non-zero thickness will appear
+            as a set of polygons.
+<p><dt><b>e</b> - Wide 2D PLINEs <dd>
+            2d-polylines with a non-zero starting width set in
+            their header entity (not the vertexes!) will appear as a
+            polygon following the trace of the polyline with a constant
+            width. This option will override the polygon option for polylines
+			that match both categories.
+            Together with a thickness and the respective option set this
+            will will result in a kind of a quadrilateral worm.
+<p><dt><b>f</b> - Closed 2d PLINES as polygons<dd>
+            2d-polylines with the closed flag set in their header entity
+            will appear as a polygon of the shape of the polyline.
+            polylines with a width will not follow this rule if
+            wide 2D-PLINEs are selected as well.
+            Together with a thickness and the respective option set this
+            will result in a prismatic volume of the shape of the polyline.
+            This option is off by default.
+<p><dt><b>g</b> - 3D MESHes <dd>
+            The Faces of 3d-polygon meshes will appear as a set of
+            polygons ignoring spline fits of any kind. Nonplanar faces
+            will be split into two triangles.
+<p><dt><b>h</b> - POLYFACEs <dd>
+            The faces of polyface meshes will
+            appear as a set of polygons. Nonplanar faces will be split
+            into two triangles.
+<p><dt><b>i</b> - Extruded LINEs <dd>
+            Lines with a non-zero thickness will appear as a
+            single polygon each.
+<p><dt><b>j</b> - Extruded ARCs <dd>
+            Arcs with a non-zero thickness will be segmented
+            according to the given arc tolerance values.
+<p><dt><b>k</b> - Extruded and flat CIRCLEs <dd>
+            Circles will appear as a ring with a inner radius of zero
+            or as a cylinder/tube with a ring at either end if their
+            thickness is non-zero.
+<p><dt><b>l</b> - POINTs as Spheres <dd>
+            Point entities will appear as spheres or bubbles depending on
+            either their thickness (if any) or else on the value of the
+            Autocad system variable "PDSIZE". if the result is zero,
+			then the entity is ignored.
+            This option is off by default.
+
+</dl>
+</dl>
+
+</div>
+
+
+<a name="examples"><h2>Examples</h2></a>
+<div>
+To convert an existing DXF file to a Radiance rad file:
+<pre><b>    dxf2rad input.dxf output.rad</b></pre>
+To convert an existing DXF file to a Radiance rad file,
+while including polygons and points/spheres as well as
+scaling the output by 2.0:
+<pre><b>    dxf2rad -s 2 +e fl input.dxf output.rad</b></pre>
+To convert an existing DXF file to standard output,
+while only including ARCs and excluding everything else,
+requiring that the arcs are subdivided with an angle
+difference of 5 degrees or less:
+<pre><b>    dxf2rad -a 5 -e abcdeghik input.dxf -</b></pre>
+
+
+</div>
+
+<a name="files"><h2>Files</h2></a>
+<div>
+<dl>
+	<p><dt>   dxf2rad[.exe] </dt><dd>         Program file</dd>
+	<p><dt>   dxf2rad-manual.html </dt><dd>      This file</dd>
+	<p><dt>   <a href="dxf2rad-readme.html">dxf2rad-readme.html</a></dt><dd>    General info</dd>
+</dl>
+
+</div>
+
+
+<a name="caveats"><h2>Caveats</h2></a>
+<div>
+    Please note that the AME solid modelling package by Autodesk as
+	included in Autocad R10-R12 generates
+    surfaces with surface normals pointing to the inside of the created
+    volumes (at least most of the times...).
+<p>
+    Models created with the AME Solid modelling package must have surfaces
+    defined with the command "SOLMESH". Otherwise they consist of only
+    wireframe information wich cannot be extracted by Radout.
+<p>
+    The "SOLID" entities in Autocad, which can be extracted with the
+    "Extruded and flat Solids" option, have nothing to do with solid
+    modelling, AME or ACIS. These are a feature out of the 2D days of
+	Autocad and are just flat quadrilateral faces which appear solidly
+	filled when viewed from top. They form quadrilateral prisms if
+	extruded, which can only be done in a right angle to their ground plane.
+
+<p>
+	Entities created with the ACIS solid modeller or custom entity
+	types defined by any other 3rd party
+	application ("proxies", previously "zombies") are ignored.
+
+
+</div>
+
+<a name="bugs"><h2>Bugs</h2></a>
+<div>
+	For multiple inserts, only one item is exported.
+</div>
+
+
+<a name="author"><h2>Author</h2></a>
+<div>
+	Georg Mischler
+
+</div>
+
+
+<a name="see"><h2>See Also</h2></a>
+<div>
+    Autocad DXF Reference and format specification.
+<p>
+    Tutorial and manual pages of Radiance 3.1, Synthetic Imaging System.
+    Gregory Ward Larson, Lawrence Berkeley Laboratory, Berkeley, CA.
+
+
+</div>
+
+<a name="license"><h2>License</h2></a>
+<div>
+<pre>
+The MIT License (MIT)
+
+Copyright &copy; 2000-2016 Georg Mischler, Munich, Germany.
+ 
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+</pre>
+</div>
+
+<div class="nav">
+	Homepage:
+<a href="http://www.schorsch.com/">www.schorsch.com</a> /
+<a href="http://www.schorsch.com/en/download/">download area</a> /
+<a href="http://www.schorsch.com/en/download/dxf2rad/">dxf2rad</a>
+</div>
+
+<!--#include virtual="_bot.html" -->
+</body>
+</html>
