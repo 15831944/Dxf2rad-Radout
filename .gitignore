@@ -1,0 +1,6 @@
+*.o
+*.un~
+*.a
+*.c~
+*.swp
+dxf2rad
