@@ -1,0 +1,66 @@
+Building Radout
+===============
+
+The most recent Releases Radout has been built for were
+Autocad R15, and Intellicad 2004.
+
+Building with newer versions will probably require some
+adaptation, which happens best by copying the interfacing
+src/radout/main_*.cpp file and changing the copy.
+Additionally, src/acis/acis_r*.cpp may also need changes.
+
+The most recent compiler used was Visual Studio 2010.
+The project files are included as examples from where to
+convert to a more recent environment.
+HINT: The project has undergone a major refactoring in the
+mean time, with many files not residing in the same directories
+anymore. 
+
+Some assembly required...
+
+
+
+Files from Autodesk
+===================
+You'll need the Autocad SDK for building.
+
+DLL files
+
+ * Autocad Release 15
+	* acgex15.dll / acgex15_d.dll
+	* acbr15.dll / acbr15_d.dll
+
+	Libraries for extracting triangulated surfaces from ACIS solids.
+	Those two DLLs come with the SDK, and may be distributed as
+	part of the application.
+
+	Similar libraries will be available for newer versions, but the
+	license terms need to be checked for each one individually.
+
+
+Source files in use:
+
+ * adcolor.c  (originally colext.c)
+ 	Copyright Autodesk inc.
+	Free license
+
+ * ads_perr.c
+	Copyright Autodesk inc.
+	Free license
+
+
+
+Files from Visio
+================
+You'll need the Intellicad SDK for building.
+
+Source files in use.
+
+ * entpoint.c
+	Interface definition file
+	Copyright Visio Corp.
+	No formal license
+	This file is necessary to build for Intellicad, and is included
+	in their SDK. You need the SDK anyway for the libraries.
+	Intellicad development is controlled by the Intellicad Technology
+	Consortium nowadays.
