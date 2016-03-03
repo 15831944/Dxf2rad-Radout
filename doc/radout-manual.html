@@ -73,10 +73,21 @@ span.dim {color:#4444dd;}
 
 <a name="INSTALLATION"> <h2> Installation </h2> </a>
 <div>
-	Radout is "installed", if the files radout.arx and radout.dcl 
+	Radout is "installed", if the files "radout.arx" and "radout.dcl"
 	are placed in a location which is included in
-    your Autocad/Intellicad support search path.
-	This support path is configured from the "Options" dialog.
+    your Autocad/Intellicad search path.
+	In the Autocad "Tools" menu select the "Options" entry.
+	In the opening dialog select the "Files" tab.
+	The relevant path type is "Search Path for ObjectARX Applications".
+	You can add the Radout directory to this path for Autocad to find it.
+<p>
+	When ACIS models in Autocad are supported, then the "acgex##.dll" and
+	"acbr##.dll" files also need to be installed in a place where Autocad can
+	find them.
+	It is best to keep them in the same folder together with the application,
+	so that the above path configuration will help Autocad to find them as
+	well.
+
 <p>
 	Load the program through the APPLOAD dialog or 
 	by entering <code>(arxload&nbsp;"radout")</code>
@@ -252,8 +263,8 @@ span.dim {color:#4444dd;}
 			the entity is ignored.
             This option is off by default.
 <p><dt> ACIS entities <dd>
-			The three items relating to ACIS solid modelling entities
-			may be disabled for very old Autocad/Intellicad releases.
+			The three items relating to ACIS solid modelling entities will be
+			disabled in Intellicad or older versions than Autocad 2000.
 
 </dl>
 
@@ -277,13 +288,18 @@ span.dim {color:#4444dd;}
 
 <h4> Program files </h4>
 <dl>
-<dt>   radout.arx/radout.dll <dd>          Main program file.
+	<dt>   radout_r[##].arx <br> radout_ic[##].dll <dd>
+			Main program file (alternatively), where [##] is the Autocad/Intellicad release
 <dt>   radout.dcl <dd>      Dialog box definition file.
+<dt>   acgex[##].dll <br> acbr[##].dll<dd> 
+	Autodesk support libraries for ACIS support (both together),
+	where [##] is the Autocad release. Autodesk permits to redistribute those
+	files with applications that need them.
 </dl>
 
 <h4> Additional Files </h4>
 <dl>
-<dt>   manual.html <dd>      This File.
+<dt>   radout-manual.html <dd>      This File.
 <dt>   <a href="radout-readme.html">radout-readme.html</a> <dd>  general info.
 </dl>
 
@@ -291,8 +307,7 @@ span.dim {color:#4444dd;}
 "Prefix" is the base name specified in the configuration dialog.
 <dl>
 	<dt>   <span class="dim">&lt;prefix&gt;</span>_l<span class="dim">&lt;layername&gt;</span>.rad <dd>
-                        Geometry data written with the Layer or Toplayer
-                        samplemodes set.
+                        Geometry data written with the Layer samplemode set.
 						<dt>   <span class="dim">&lt;prefix&gt;</span>_c<span class="dim">&lt;colornumber&gt;</span>.rad <dd>
                         Geometry data written with the Color samplemode set.
 						<dt>   <span class="dim">&lt;prefix&gt;</span>_mat.rad <dd>    Material definitions for exported files.
@@ -300,16 +315,6 @@ span.dim {color:#4444dd;}
 						<dt>   <span class="dim">&lt;prefix&gt;</span>.rif <dd>    Radiance input file for rad(1).
 </dl>
 
-</div>
-
-
-<a name="REQUIREMENTS"> <h2> Requirements </h2> </a>
-<div>
-    Radout is meant to run with Autocad R12 and up,
-	and for Intellicad 2000 and up.
-<p>
-	Most recent actively supported Platforms were Autocad 2000 (R13)
-	and Intellicad 2004.
 </div>
 
 
@@ -334,7 +339,7 @@ span.dim {color:#4444dd;}
 <p>
 	Custom entity types defined by 3rd party applications ("proxies",
 	previously "zombies") are ignored, with the notable exception of
-	ACIS solid modelling entities.
+	ACIS solid modelling entities starting with Autocad 2000.
 </div>
 
 <a name="BUGS"> <h2> Bugs </h2> </a>
