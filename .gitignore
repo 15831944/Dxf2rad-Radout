@@ -6,6 +6,9 @@
 dxf2rad
 *.mf~
 distr_dxf2rad/
+distr_radout/
 *.gitignore~
 dxf2rad_r.exe
 *.html~
+*.filters
+.vs/
